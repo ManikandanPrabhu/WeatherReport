@@ -10,12 +10,36 @@
       <h4>Fetching Location Information ... </h4>
   </div>
 
-  <mat-list class="location-details" role="list" *ngIf="!isSearching && !onLoad && !noDataFound">
-    <mat-list-item role="listitem" *ngFor="let data of apiResponse">
-      <span class="location-info" (click)="openDialog(data)"> {{data.title}}</span>
-      <span class="location-info" (click)="openDialog(data)"> {{data.location_type}}</span>
-    </mat-list-item>
-  </mat-list>
+  <table mat-table [dataSource]="apiResponse" class="mat-elevation-z8"
+  *ngIf="!isSearching && !onLoad && !noDataFound">
+
+      <!-- title Column -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef> Title </th>
+        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+      </ng-container>
+
+      <!-- location_type Column -->
+      <ng-container matColumnDef="location_type">
+        <th mat-header-cell *matHeaderCellDef> Location Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.location_type}} </td>
+      </ng-container>
+
+      <!-- latt_long Column -->
+      <ng-container matColumnDef="latt_long">
+        <th mat-header-cell *matHeaderCellDef> Lattitue_longitude </th>
+        <td mat-cell *matCellDef="let element"> {{element.latt_long}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="view">
+          <th mat-header-cell [hidden] *matHeaderCellDef> </th>
+          <td mat-cell *matCellDef="let element"> <button (click)="openDialog(element)">view</button></td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
   <div *ngIf="noDataFound && !onLoad" class="error-text">
      Please Enter a valid Location....</div>
 </div>

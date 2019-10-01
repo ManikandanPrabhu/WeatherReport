@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit, ElementRef, SimpleChanges } from '@angular/core';
 import { Subject, fromEvent, of, Subscription } from 'rxjs';
 import { debounceTime, map, distinctUntilChanged, filter } from "rxjs/operators";
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -11,14 +11,17 @@ import { WeatherDialogComponent } from '../weather-dialog/weather-dialog.compone
   templateUrl: './weather-list.component.html',
   styleUrls: ['./weather-list.component.less']
 })
-export class WeatherListComponent implements OnInit, AfterViewInit {
+export class WeatherListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   model: any = {};
   apiResponse:any;
   isSearching:boolean;
   subscribedData: Subscription;
+  weatherData: Subscription;
+  result: any;
   onLoad: boolean = true;
   noDataFound: boolean = false;
+  displayedColumns: string[] = ['title', 'location_type', 'latt_long', 'view'];
   @ViewChild('f', {static: true}) formData: ElementRef;
   @ViewChild('locationName', {static: true}) locationInput: ElementRef;
 
@@ -54,12 +57,9 @@ export class WeatherListComponent implements OnInit, AfterViewInit {
       ).subscribe((text: string) => {
         this.isSearching = true;
         this.searchGetCall(text).subscribe((res: any)=>{
-          console.log('res',res);
           if (res && res.length > 0) {
-            console.log("inside");
             this.noDataFound = false;
           } else {
-            console.log("outside");
             this.noDataFound = true;
           }
           this.isSearching = false;
@@ -87,8 +87,18 @@ export class WeatherListComponent implements OnInit, AfterViewInit {
 
   // Open Modal Dialog
   openDialog(info) {
-    this.dialog.open(WeatherDialogComponent, { width: '650px', data : info });
-}
+    const weatherInfo = 'https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/'
+    this.weatherData = this.http.get(`${weatherInfo}${info.woeid}/`).subscribe(
+      result => {
+        this.dialog.open(WeatherDialogComponent, { width: '650px', data : result });
+        return this.result = result;
+      });
+  }
+
+  ngOnDestroy() {
+    this.subscribedData.unsubscribe();
+    this.weatherData.unsubscribe();
+  }
 }
 
 
