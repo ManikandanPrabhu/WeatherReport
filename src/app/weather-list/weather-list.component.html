@@ -1,0 +1,21 @@
+<div id="location_information">
+  <div class="center-text">Enter atleast three characters to begin your search</div>
+  <form #f="ngForm" class="example-form">
+    <mat-form-field class="example-half-width">
+      <input matInput placeholder="Enter Location" autocomplete="off" name="locationName"
+        [(ngModel)]="model.locationName" #locationName >
+    </mat-form-field>
+  </form>
+  <div class="search-text" *ngIf="isSearching">
+      <h4>Fetching Location Information ... </h4>
+  </div>
+
+  <mat-list class="location-details" role="list" *ngIf="!isSearching && !onLoad && !noDataFound">
+    <mat-list-item role="listitem" *ngFor="let data of apiResponse">
+      <span class="location-info" (click)="openDialog(data)"> {{data.title}}</span>
+      <span class="location-info" (click)="openDialog(data)"> {{data.location_type}}</span>
+    </mat-list-item>
+  </mat-list>
+  <div *ngIf="noDataFound && !onLoad" class="error-text">
+     Please Enter a valid Location....</div>
+</div>
